@@ -40,7 +40,7 @@ class repositorioUsuario{
     required String contrasena,
   })async{
     // ignore: lines_longer_than_80_chars
-    final usuario = await _db.usuarios.create(data: UsuariosCreateInput(nombre: nombre, apellido: apellido, cedula: cedula, correo: correo, contrasena: _hashContrasena(contrasena)));
+    final usuario = await _db.usuarios.create(data: UsuariosCreateInput(nombre: nombre, apellido: apellido, cedula: cedula, correo: correo, contrasena: _hashContrasena(contrasena), rol: 'usuario'));
     return usuario;
   }
 
@@ -60,6 +60,33 @@ class repositorioUsuario{
       return jwt.payload as int;
     }on JWTException catch(_){
       return null;
+    }
+  }
+
+  Future<void> deleteUsuario({
+    required String correo
+  })async{
+    await _db.usuarios.delete(where: UsuariosWhereUniqueInput(correo: correo));
+  }
+
+  Future<void> actualizarUsuario({
+    required String dato,
+    required String correo,
+    required String inf,
+  })async{
+
+    switch(dato){
+      case 'nombre':
+        // ignore: lines_longer_than_80_chars
+        await _db.usuarios.update(data: UsuariosUpdateInput(nombre: StringFieldUpdateOperationsInput(set: inf)), where: UsuariosWhereUniqueInput(correo: correo));
+      case 'apellido':
+        await _db.usuarios.update(data: UsuariosUpdateInput(apellido: StringFieldUpdateOperationsInput(set: inf)), where: UsuariosWhereUniqueInput(correo: correo));;
+      case 'cedula':
+        await _db.usuarios.update(data: UsuariosUpdateInput(cedula: StringFieldUpdateOperationsInput(set: inf)), where: UsuariosWhereUniqueInput(correo: correo));;
+      case 'correo':
+        await _db.usuarios.update(data: UsuariosUpdateInput(correo: StringFieldUpdateOperationsInput(set: inf)), where: UsuariosWhereUniqueInput(correo: correo));;
+      case 'contrasena':
+        await _db.usuarios.update(data: UsuariosUpdateInput(contrasena: StringFieldUpdateOperationsInput(set: inf)), where: UsuariosWhereUniqueInput(correo: correo));;
     }
   }
 

@@ -10,9 +10,15 @@ Future<Response> onRequest(RequestContext context) {
   return switch(context.request.method){
     HttpMethod.get => _getUsers(context),
     HttpMethod.post => _createUser(context),
+    HttpMethod.delete => _borrarUsuario(context),
+    HttpMethod.put => _actualizarUsuario(context),
     _ => Future.value(Response(body: 'esto es un metodo $mt'))
   };
 }
+
+
+
+
 
 Future<Response> _getUsers(RequestContext context) async{
 
@@ -24,6 +30,35 @@ Future<Response> _getUsers(RequestContext context) async{
     body: users
     )
   );
+}
+
+Future<Response> _borrarUsuario(RequestContext context) async {
+
+  final json = (await context.request.json()) as Map<String,dynamic>;
+  final correo = json['correo'].toString();
+
+
+
+
+  final repo = context.read<repositorioUsuario>();
+
+  var _er = await repo.ifExist(correo: correo);
+
+  if(_er == null){
+  return Response.json(
+    body: {
+      'mensaje' : 'Este usuario no existe'
+    }
+  );
+  }else{
+  await repo.deleteUsuario(correo: correo);
+  return Response.json(
+    body: {
+      'mensaje' : 'usuario borrado',
+    }
+  );
+  }
+  
 }
 
 Future<Response> _createUser(RequestContext context) async{
@@ -65,5 +100,42 @@ Future<Response> _createUser(RequestContext context) async{
       'mensaje' : 'Este correo ya esta registrado'
     }
   );
+  }
+
+}
+
+
+Future<Response> _actualizarUsuario(RequestContext context) async{
+  final json = (await context.request.json()) as Map<String,dynamic>;
+  final correo = json['correo'].toString();
+  final dato = json['dato'].toString();
+  final inf = json['inf'].toString();
+
+  final repo = context.read<repositorioUsuario>();
+
+  if(dato == 'correo'){
+    var _er = await repo.ifExist(correo: inf);
+
+    if(_er == null){
+    await repo.actualizarUsuario(dato: dato, correo: correo, inf: inf);
+    return Response.json(
+      body: {
+        'mensaje' : 'usuario actulizado'
+      }
+    );
+    }else{
+    return Response.json(
+      body: {
+        'mensaje' : 'el correo ya esta registrado',
+      }
+    );
+    }
+  }else{
+    await repo.actualizarUsuario(dato: dato, correo: correo, inf: inf);
+    return Response.json(
+      body: {
+        'mensaje' : 'usuario actulizado'
+      }
+    );
   }
 }

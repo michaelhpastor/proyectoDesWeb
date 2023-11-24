@@ -17,4 +17,56 @@ model usuarios{
   cedula String
   correo String @unique
   contrasena String
+  rol String 
+}
+
+model establecimientos{
+  id Int @id @default(autoincrement())
+  nombre String
+  direccion String
+  ciudad String
+  imagen String
+  horario String
+  empleados empleados[]
+}
+
+model especialistas{
+  id Int @id @default(autoincrement())
+  nombre String
+  apellido String
+  telefono String
+  imagen String
+  horario String
+  agendaEspecialista agendaEspecialista[]
+}
+
+model empleados{
+  id Int @id @default(autoincrement())
+  idEstablecimiento Int
+  establecimiento establecimientos @relation(fields: [idEstablecimiento], references: [id])
+  nombre String
+  apellido String
+  imagen String
+  horaio String
+  agendaEmpleado agendaEmpleados[]
+}
+
+model agendaEspecialista{
+  id Int @id @default(autoincrement())
+  idEspecialista Int
+  especialista especialistas @relation(fields: [idEspecialista], references: [id])
+  idUsuario Int
+  fecha String
+  hora String
+  lugar String
+}
+
+model agendaEmpleados{
+  id Int @id @default(autoincrement())
+  idempleado Int
+  empleado empleados @relation(fields: [idempleado], references: [id])
+  idUsuario Int
+  fecha String
+  hora String
+  lugar String
 }
